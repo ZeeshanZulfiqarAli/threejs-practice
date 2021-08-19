@@ -9,21 +9,9 @@ const Root = () => {
 
         // Sizes
         const sizes = {
-            width: 800,
-            height: 600
+            width: window.innerWidth,
+            height: window.innerHeight
         }
-
-        // Cursor
-        const cursor = {
-            x: 0,
-            y: 0
-        }
-
-        window.addEventListener('mousemove', (event) =>
-        {
-            cursor.x = event.clientX / sizes.width - 0.5
-            cursor.y = - (event.clientY / sizes.height - 0.5)
-        })
 
         // Scene
         const scene = new THREE.Scene()
@@ -35,6 +23,43 @@ const Root = () => {
         )
         scene.add(mesh)
 
+        // Adapt to screen resize
+        window.addEventListener('resize', () =>
+        {
+            sizes.width = window.innerWidth
+            sizes.height = window.innerHeight
+
+            camera.aspect = sizes.width/sizes.height
+            camera.updateProjectionMatrix()
+
+            renderer.setSize(sizes.width, sizes.height)
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        })
+
+        // Fullscreen
+        window.addEventListener("dblclick", () => {
+
+            // Making it work with safari
+            const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
+
+            if(!fullscreenElement) {
+                // going fullscreen
+                if(canvas.current.requestFullscreen) {
+                    canvas.current.requestFullscreen()
+                } else if (canvas.current.webkitRequestFullscreen) {
+                    canvas.current.webkitRequestFullscreen()
+                }
+            }
+            else {
+                // exiting fullscreen
+                if(document.exitFullscreen) {
+                    document.exitFullscreen()
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen()
+                }
+            }
+        })
+
         // Camera
         const camera = new THREE.PerspectiveCamera(55, sizes.width / sizes.height, 0.1, 100)
         camera.position.z = 3
@@ -43,16 +68,14 @@ const Root = () => {
         // Controls
         const controls = new OrbitControls(camera, canvas.current)
         controls.enableDamping = true
-        // Can change the camera target in controls
-        // controls.target.y = 2
-        // controls.update()
 
         // Renderer
         const renderer = new THREE.WebGLRenderer({
             canvas: canvas.current
         })
         renderer.setSize(sizes.width, sizes.height)
-        // renderer.render(scene, camera)
+        // Prevents ragged edges and other artifacts in higher pixel ratio devices
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
         // Animate
         // const clock = new THREE.Clock()
@@ -75,7 +98,6 @@ const Root = () => {
 
     return (
         <div>
-            Hello
             <canvas className="webgl" ref={canvas}></canvas>
         </div>
     );
