@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 const Root = () => {
     const canvas = useRef();
@@ -36,8 +37,15 @@ const Root = () => {
 
         // Camera
         const camera = new THREE.PerspectiveCamera(55, sizes.width / sizes.height, 0.1, 100)
-
+        camera.position.z = 3
         scene.add(camera)
+
+        // Controls
+        const controls = new OrbitControls(camera, canvas.current)
+        controls.enableDamping = true
+        // Can change the camera target in controls
+        // controls.target.y = 2
+        // controls.update()
 
         // Renderer
         const renderer = new THREE.WebGLRenderer({
@@ -47,21 +55,15 @@ const Root = () => {
         // renderer.render(scene, camera)
 
         // Animate
-        const clock = new THREE.Clock()
+        // const clock = new THREE.Clock()
 
         const tick = () =>
         {
             // const elapsedTime = clock.getElapsedTime()
 
             // Update controls
-            // mesh.rotation.y = elapsedTime
-            // controls.update()
+            controls.update()
 
-            // Update camera
-            camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 3
-            camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 3
-            camera.position.y = cursor.y * 3
-            camera.lookAt(mesh.position)
             // Render
             renderer.render(scene, camera)
 
