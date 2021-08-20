@@ -17,9 +17,17 @@ const Root = () => {
         const scene = new THREE.Scene()
 
         // Object
+        const geometry = new THREE.BufferGeometry()
+        const count = 50 // count of triangles
+        const positionsArray = new Float32Array(count * 3 * 3) // each triangle has 3 vertices and each vertex has 3 coordinates
+        for (let i = 0; i<count*3*3; i++) {
+            positionsArray[i] = (Math.random() - 0.5) * 4
+        }
+        const positionAttribute = new THREE.BufferAttribute(positionsArray, 3)
+        geometry.setAttribute("position", positionAttribute)
         const mesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1,1,1,5,5,5),
-            new THREE.MeshBasicMaterial({color: 0xff0000})
+            geometry,
+            new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true})
         )
         scene.add(mesh)
 
