@@ -1,20 +1,11 @@
 import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import gsap from 'gsap'
-import * as dat from 'dat.gui'
 
 const Root = () => {
     const canvas = useRef();
 
     useEffect(() => {
-
-        const parameters = {
-            color: 0xff0000,
-            spin: () => {
-                gsap.to(mesh.rotation, 1, { y: mesh.rotation.y + Math.PI * 2})
-            }
-        }
 
         // Sizes
         const sizes = {
@@ -25,11 +16,34 @@ const Root = () => {
         // Scene
         const scene = new THREE.Scene()
 
+        // Textures
+        const loadingManager = new THREE.LoadingManager()
+        loadingManager.onStart = () => {}
+        loadingManager.onProgress = () => {}
+        loadingManager.onLoad = () => {}
+        loadingManager.onError = () => {}
+
+        const textureLoader = new THREE.TextureLoader(loadingManager)
+        // const colorTexture = textureLoader.load("../../assets/textures/door/color.jpg")
+        const colorTexture = textureLoader.load("../../assets/textures/checkerboard-1024x1024.png")
+        // colorTexture.wrapS = THREE.MirroredRepeatWrapping
+        // colorTexture.wrapT = THREE.MirroredRepeatWrapping
+        // colorTexture.repeat.x = 2
+        // colorTexture.repeat.y = 3
+        // colorTexture.offset.x = 0.5
+        // colorTexture.offset.y = 0.5
+        // colorTexture.rotation = Math.PI * 0.25
+        // colorTexture.center.x = 0.5
+        // colorTexture.center.y = 0.5
+        // colorTexture.generateMipmaps = false
+        // colorTexture.minFilter = THREE.NearestFilter
+        // colorTexture.magFilter = THREE.NearestFilter
+
         // Object
         const geometry = new THREE.BoxBufferGeometry(1,1,1)
         const mesh = new THREE.Mesh(
             geometry,
-            new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true})
+            new THREE.MeshBasicMaterial({map: colorTexture})
         )
         scene.add(mesh)
 
@@ -87,23 +101,6 @@ const Root = () => {
         // Prevents ragged edges and other artifacts in higher pixel ratio devices
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
-        // Debug
-        const gui = new dat.GUI({
-            width: 400,
-            // closed: true,
-        })
-
-        // programatically hide the debug window
-        // gui.hide()
-        gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation")
-        gui.add(mesh, "visible")
-        gui.add(mesh.material, "wireframe")
-        gui .addColor(parameters, "color")
-            .onChange(()=>{
-                mesh.material.color.set(parameters.color)
-            })
-        
-        gui .add(parameters, "spin")
         // Animate
         // const clock = new THREE.Clock()
 
