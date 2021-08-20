@@ -1,11 +1,20 @@
 import * as THREE from 'three';
 import { useEffect, useRef } from 'react';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import gsap from 'gsap'
+import * as dat from 'dat.gui'
 
 const Root = () => {
     const canvas = useRef();
 
     useEffect(() => {
+
+        const parameters = {
+            color: 0xff0000,
+            spin: () => {
+                gsap.to(mesh.rotation, 1, { y: mesh.rotation.y + Math.PI * 2})
+            }
+        }
 
         // Sizes
         const sizes = {
@@ -17,14 +26,7 @@ const Root = () => {
         const scene = new THREE.Scene()
 
         // Object
-        const geometry = new THREE.BufferGeometry()
-        const count = 50 // count of triangles
-        const positionsArray = new Float32Array(count * 3 * 3) // each triangle has 3 vertices and each vertex has 3 coordinates
-        for (let i = 0; i<count*3*3; i++) {
-            positionsArray[i] = (Math.random() - 0.5) * 4
-        }
-        const positionAttribute = new THREE.BufferAttribute(positionsArray, 3)
-        geometry.setAttribute("position", positionAttribute)
+        const geometry = new THREE.BoxBufferGeometry(1,1,1)
         const mesh = new THREE.Mesh(
             geometry,
             new THREE.MeshBasicMaterial({color: 0xff0000, wireframe: true})
@@ -85,6 +87,23 @@ const Root = () => {
         // Prevents ragged edges and other artifacts in higher pixel ratio devices
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
+        // Debug
+        const gui = new dat.GUI({
+            width: 400,
+            // closed: true,
+        })
+
+        // programatically hide the debug window
+        // gui.hide()
+        gui.add(mesh.position, "y").min(-3).max(3).step(0.01).name("elevation")
+        gui.add(mesh, "visible")
+        gui.add(mesh.material, "wireframe")
+        gui .addColor(parameters, "color")
+            .onChange(()=>{
+                mesh.material.color.set(parameters.color)
+            })
+        
+        gui .add(parameters, "spin")
         // Animate
         // const clock = new THREE.Clock()
 
